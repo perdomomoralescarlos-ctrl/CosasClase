@@ -3,7 +3,6 @@ class ClubFutbol{
 
     constructor(nombre, presupuestoInicial){
         this.nombre = nombre;
-        this.#presupuesto = presupuestoInicial < 0 ? 0 : this.presupuestoInicial;
         
         if (presupuestoInicial < 0){
             console.log("Aviso: El saldo inicial no puede ser negativo para " + nombre + ". Se asignara 0.");
@@ -14,12 +13,12 @@ class ClubFutbol{
     }
 
     get presupuesto() {
-        return this.#presupuesto
+        return this.#presupuesto;
     }
 
     set presupuesto(valor) {
         if (valor < 0) {
-            console.error("No se pudo asignar el presupuesto")
+            console.error("No se pudo asignar el presupuesto");
             return;
         }
         this.#presupuesto = valor;
@@ -29,7 +28,7 @@ class ClubFutbol{
     console.log("Titular: " + this.nombre + " | Saldo actual: " + this.#presupuesto + " euros");
 }
 
-ingreasarDinero(cantidad) {
+ingresarDinero(cantidad) {
         if (cantidad > 0) {
             this.#presupuesto = this.#presupuesto + cantidad;
             console.log("Has depositado " + cantidad + " euros. Nuevo saldo: " + this.#presupuesto + " euros.");
@@ -45,12 +44,45 @@ ingreasarDinero(cantidad) {
             return true;
         } else {
             console.log("Error: Fondos insuficientes o cantidad no valida para " + this.nombre);
-            return false
+            return false;
         }
+    }
+
+    //metodo estatico coordinador
+    static ficharJugador(clubComprador, clubVendedor, nombreJugador, costoFichaje) {
+        if (clubComprador === clubVendedor) {
+            console.log("Error: un club no puede fichar a un jugador de si mismo.");
+            return false;
+        }
+
+        if (clubComprador.retirarDinero(costoFichaje)) {
+            clubVendedor.ingresarDinero(costoFichaje);
+            console.log("Fichaje Terminado: " + nombreJugador + " pasa de " +clubVendedor.nombre + " a " +clubComprador.nombre + " por " + costoFichaje + " €.");
+            return true;
+        }
+        console.log("Fichaje Fallido: " + clubComprador.nombre + " no puede pagar " + costoFichaje + " € por " + nombreJugador + ".");
+        return false;
     }
 }
 
-const cuenta2 = new ClubFutbol("Barça", -100);
-cuenta2.consultarEstado();
-cuenta2.ingreasarDinero(80);
-cuenta2.retirarDinero(40);
+const barcelona = new ClubFutbol("Barça", -100);
+const madrid = new ClubFutbol("Real Madrid", 200000);
+barcelona.consultarEstado();
+madrid.consultarEstado();
+
+//Setter en negativo
+barcelona.presupuesto = -50;
+console.log(barcelona.presupuesto);
+
+//setter valido
+barcelona.presupuesto = 1000000;
+console.log(barcelona.presupuesto);
+
+//fichaje con fondos suficientes
+ClubFutbol.ficharJugador(madrid, barcelona, "Lamine Jamal", 120000);
+
+//fichaje sin fondos
+ClubFutbol.ficharJugador(barcelona, madrid, "Pedro Sanchez", 99999999);
+
+barcelona.consultarEstado();
+madrid.consultarEstado();
